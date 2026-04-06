@@ -1,0 +1,20 @@
+{
+  "projects": {
+    "default": "zpos-uk"
+  },
+  "targets": {
+    "zpos-uk": {
+      "hosting": {
+        "admin": [
+          "zpos-uk-admin"
+        ],
+        "uat": [
+          "zpos-uk-admin-uat"
+        ],
+        "dev": [
+          "zpos-uk-admin-dev"
+        ]
+      }
+    }
+  }
+}
