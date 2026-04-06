@@ -1,0 +1,111 @@
+import axios, { AxiosError } from 'axios';
+import { store } from '@redux/store';
+import { setSessionExpired, login } from '@redux/slices/auth';
+import { HOST_API } from 'config-global';
+import { ApiErrorDataDtoSchema } from './api.contracts';
+import { normalizeValidationErrors } from './api.lib';
+
+// ----------------------------------------------------------------------
+
+let isRefreshing = false;
+let failedQueue: any[] = [];
+
+const processQueue = (error: any, token: string | null = null) => {
+  failedQueue.forEach((prom) => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+  failedQueue = [];
+};
+
+export const api = axios.create({
+  baseURL: HOST_API,
+  withCredentials: true,
+});
+
+api.interceptors.request.use(
+  (config) => {
+    const { accessToken } = store.getState().auth;
+    if (accessToken) {
+      config.headers.Authorization = `Bearer ${accessToken}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+
+    if (!axios.isAxiosError(error) || !error.response) {
+      return Promise.reject(error);
+    }
+
+    // 1. Handle 401 Unauthorized for Token Refresh
+    if (error.response.status === 401 && !originalRequest._retry) {
+      if (isRefreshing) {
+        try {
+          const token = await new Promise((resolve, reject) => {
+            failedQueue.push({ resolve, reject });
+          });
+          originalRequest.headers.Authorization = `Bearer ${token}`;
+          return await api(originalRequest);
+        } catch (err) {
+          return await Promise.reject(err);
+        }
+      }
+
+      originalRequest._retry = true;
+      isRefreshing = true;
+
+      try {
+        // Use full URL and base axios to avoid interceptor loop
+        const response = await axios.post(
+          `${HOST_API}/refresh-token/refresh`,
+          {},
+          { withCredentials: true }
+        );
+        const { accessToken } = response.data.data; // Assuming nested structure based on user's backend sendSuccess
+
+        store.dispatch(login({ accessToken }));
+
+        originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+        processQueue(null, accessToken);
+        return await api(originalRequest);
+      } catch (refreshError) {
+        processQueue(refreshError, null);
+        store.dispatch(setSessionExpired(true));
+        return await Promise.reject(refreshError);
+      } finally {
+        isRefreshing = false;
+      }
+    }
+
+    // 2. Handle Validation Errors (Existing Logic)
+    const validation = ApiErrorDataDtoSchema.safeParse(error.response?.data);
+
+    if (!validation.success) {
+      return Promise.reject(error);
+    }
+
+    const normalizedErrorResponse = {
+      ...error.response!,
+      data: normalizeValidationErrors(validation.data),
+    };
+
+    return Promise.reject(
+      new AxiosError(
+        error.message,
+        error.code,
+        error.config,
+        error.request,
+        normalizedErrorResponse
+      )
+    );
+  }
+);
