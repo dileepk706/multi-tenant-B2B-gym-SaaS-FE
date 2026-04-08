@@ -1,9 +1,10 @@
 import { useEffect, useCallback, useState } from 'react';
-import { paths } from 'shared/routes';
+import { pathKeys } from 'shared/routes';
 import { useRouter } from '@routes/hook';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Typography } from '@mui/material';
 import { useAppSelector } from '@redux/store';
 import Button from '@components/button/Button';
+import { SplashScreen } from '@components/loading-screen';
 import { useAuthContext } from '../hooks';
 // ----------------------------------------------------------------------
 
@@ -27,7 +28,7 @@ export default function AuthGuard({ children }: Props) {
         returnTo: window.location.pathname + window.location.search,
       }).toString();
 
-      const href = `${paths.auth.userLogin}?${searchParams}`;
+      const href = `${pathKeys.auth.userLogin}?${searchParams}`;
       router.replace(href);
     } else {
       setChecked(true);
@@ -39,8 +40,9 @@ export default function AuthGuard({ children }: Props) {
   }, [check]);
 
   if (loading || !checked) {
-    return null;
+    return <SplashScreen />;
   }
+
 
   if (sessionExpired) {
     return <RefreshError />;
