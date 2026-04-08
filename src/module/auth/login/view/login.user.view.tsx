@@ -41,7 +41,7 @@ function BaseLoginForm() {
   } = useForm<LoginUser>({
     mode: 'onTouched',
     resolver: standardSchemaResolver(LoginUserSchema),
-    defaultValues: { email: '', password: '' },
+    defaultValues: { email: 'dlpkmr706@gmail.com', password: '11111111' },
   });
 
   const { mutate, isPending, isError, error } = useLoginMutation({

@@ -1,10 +1,10 @@
 import { DefaultError, useMutation, UseMutationOptions } from '@tanstack/react-query';
 import { useAuthContext } from '@auth/hooks/use-auth-context';
-import { UserDto } from 'shared/api/api.types';
+import { User } from 'entities/user/user.entity';
 import { LoginUser } from './login.types';
 
 export function useLoginMutation(
-  options: Partial<UseMutationOptions<UserDto, DefaultError, LoginUser, unknown>> = {}
+  options: Partial<UseMutationOptions<User, DefaultError, LoginUser, unknown>> = {}
 ) {
   const { login } = useAuthContext();
   const { mutationKey = [], onMutate, onSuccess, onError, onSettled } = options;
