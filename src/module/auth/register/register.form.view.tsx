@@ -17,7 +17,7 @@ import {
   Stack,
 } from '@mui/material';
 import TextField from '@components/text-field/text-field';
-import { inconString } from '@components/iconify/icons';
+import { ICONS, inconString } from '@components/iconify/icons';
 import Button from '@components/button/Button';
 import AuthViewWraper from 'module/auth/components/AuthVIewWraper';
 import Iconify from '@components/iconify';
@@ -25,7 +25,8 @@ import { useRouter } from '@routes/hook';
 import { LogoPng } from '@components/logo';
 import CustomLink from '@components/link/CustomeLink';
 import { getErrorMessages } from 'shared/api/api.lib';
-import { RegisterUser } from './register.types';
+import TextFieldLabel from '@components/text-field/text-field-label';
+import { TRegisterUser } from './register.types';
 import { RegisterUserSchema } from './register.contracts';
 import { useRegisterMutation } from './register.mutation';
 
@@ -46,7 +47,7 @@ function BaseRegisterForm() {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<RegisterUser>({
+  } = useForm<TRegisterUser>({
     mode: 'onTouched',
     resolver: standardSchemaResolver(RegisterUserSchema),
     defaultValues: {
@@ -64,11 +65,10 @@ function BaseRegisterForm() {
     },
   });
 
-  console.log({ error });
   const mutationErrors = getErrorMessages(error);
   const loading = isPending || isSubmitting;
 
-  const onValid = (registerData: RegisterUser) => {
+  const onValid = (registerData: TRegisterUser) => {
     mutate(registerData);
   };
 
@@ -102,11 +102,9 @@ function BaseRegisterForm() {
 
         <Stack spacing={2.5}>
           <Box>
-            <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
-              Full Name
-            </Typography>
-            <TextField
+            <TextFieldLabel
               fullWidth
+              label="Full Name"
               placeholder="John Doe"
               error={!!errors.name}
               errorMessage={errors.name?.message}
@@ -196,7 +194,7 @@ function BaseRegisterForm() {
             size="large"
             disabled={loading}
             appearance="primary"
-            endIcon={<Iconify icon="solar:arrow-right-outline" />}
+            endIcon={ICONS.arrowRight}
             sx={{
               fontWeight: 700,
               textTransform: 'none',

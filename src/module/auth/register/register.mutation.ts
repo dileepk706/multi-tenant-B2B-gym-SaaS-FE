@@ -1,17 +1,17 @@
 import { DefaultError, useMutation, UseMutationOptions } from '@tanstack/react-query';
 import { useAuthContext } from '@auth/hooks/use-auth-context';
-import { UserDto } from 'shared/api/api.types';
-import { RegisterUser } from './register.types';
+import { User } from 'entities/user/user.entity';
+import { TRegisterUser } from './register.types';
 
 export function useRegisterMutation(
-  options: Partial<UseMutationOptions<UserDto, DefaultError, RegisterUser, unknown>> = {}
+  options: Partial<UseMutationOptions<User, DefaultError, TRegisterUser, unknown>> = {}
 ) {
   const { register } = useAuthContext();
   const { mutationKey = [], onMutate, onError, onSettled, onSuccess } = options;
 
   return useMutation({
     mutationKey: ['session', 'register-user', ...mutationKey],
-    mutationFn: async (registerUserData: RegisterUser) => {
+    mutationFn: async (registerUserData: TRegisterUser) => {
       const data = await register(registerUserData);
       return data;
     },
