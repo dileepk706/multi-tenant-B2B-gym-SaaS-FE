@@ -7,9 +7,6 @@ import AuthViewWraper from 'module/auth/components/AuthVIewWraper';
 import { useAuthContext } from '@auth/hooks';
 import { pathKeys } from 'shared/routes';
 import { useRouter } from '@routes/hook';
-import { login } from '@redux/slices/auth';
-import { getRefreshToken } from 'shared/api/api.instance';
-import { store } from '@redux/store';
 import { TOnboarding } from './onboarding.types';
 import { OnboardingSchema } from './onboarding.contracts';
 import { useOnboardingMutation } from './onboarding.mutation';
@@ -42,9 +39,7 @@ export default function OnboardingView() {
   } = useOnboardingMutation({
     async onSuccess() {
       await refreshProfile();
-      const accessToken = await getRefreshToken();
-      store.dispatch(login({ accessToken }));
-      router.replace(pathKeys.dashboard.root);
+      router.push(pathKeys.dashboard.root);
     },
   });
   const mutationErrors = getErrorMessages(error);

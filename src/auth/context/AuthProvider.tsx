@@ -23,7 +23,7 @@ export function AuthProvider({ children }: Props) {
   const dispatch = useDispatch();
   const [user, setUser] = useState<User | null>(null);
 
-  const { accessToken, sessionExpired, loading } = useAppSelector((state) => state.auth);
+  const { accessToken, loading } = useAppSelector((state) => state.auth);
 
   const fetchUserProfile = useCallback(async () => {
     try {
@@ -65,7 +65,6 @@ export function AuthProvider({ children }: Props) {
     },
     [dispatch]
   );
-
 
   const register = useCallback(async (registerUserDto: RegisterUserDto) => {
     const response = await registerUser(registerUserDto);
