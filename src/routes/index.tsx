@@ -1,16 +1,10 @@
-import { useState, useEffect, Suspense, ReactNode } from 'react';
-import {
-  Outlet,
-  RouteObject,
-  RouterProvider,
-  createBrowserRouter,
-  redirect,
-  useRouteError,
-} from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { RouterProvider, createBrowserRouter, redirect, useRouteError } from 'react-router-dom';
+import { LoadingScreen } from '@components/loading-screen';
 import NotFoundPage from '@pages/404';
 import { pathKeys } from '../shared/routes';
-import { authJWT } from './modules/auth';
-import { userRoutes } from './modules/user';
+import { authRoutes } from './modules/auth';
+import { onboardingRoutes, userRoutes } from './modules/user';
 
 export function BootstrappedRouter() {
   const [router, setRouter] = useState<ReturnType<typeof browserRouter> | null>(null);
@@ -20,10 +14,10 @@ export function BootstrappedRouter() {
   }, []);
 
   if (!router) {
-    return <h1>Loading</h1>;
+    return <h1>Initaillizing routers</h1>;
   }
 
-  return <RouterProvider router={router} fallbackElement={<h1>Loading</h1>} />;
+  return <RouterProvider router={router} fallbackElement={<LoadingScreen />} />;
 }
 
 const browserRouter = () =>
@@ -32,10 +26,13 @@ const browserRouter = () =>
       errorElement: <BubbleError />,
       children: [
         // auth
-        authJWT,
+        authRoutes,
 
         // user routes
         userRoutes,
+
+        // onboarding
+        onboardingRoutes,
 
         {
           path: '/404',

@@ -1,25 +1,30 @@
-import { ReactNode, Suspense } from 'react';
+import { Suspense } from 'react';
 import { Outlet, RouteObject } from 'react-router-dom';
-import { LoadingScreen } from '@components/loading-screen';
+import { LoadingScreen, SplashScreen } from '@components/loading-screen';
 import AuthGuard from '@auth/guard/AuthGuard';
+import GymGuard from '@auth/guard/GymGuard';
 import AppLayout from '@layouts/app/AppLayout';
 import { pathKeys } from 'shared/routes';
 import { useAuthContext } from '@auth/hooks';
 import Button from '@mui/material/Button';
-import { api } from 'shared/api/api.instance';
+import { getUserProfile } from 'shared/api/api.services';
+import AuthLayout from '@layouts/auth/classic';
+import { onboardingUserPageRoute } from '@pages/onboarding/onboarding-user.page.route';
 // ----------------------------------------------------------------------
 
 export const userRoutes: RouteObject = {
   path: '/',
   element: (
     <AuthGuard>
-      <AppLayout>
-        {/* <PaymentGuard> */}
-        <Suspense fallback={<LoadingScreen />}>
-          <Outlet />
-        </Suspense>
-        {/* </PaymentGuard> */}
-      </AppLayout>
+      <GymGuard>
+        <AppLayout>
+          {/* <PaymentGuard> */}
+          <Suspense fallback={<LoadingScreen />}>
+            <Outlet />
+          </Suspense>
+          {/* </PaymentGuard> */}
+        </AppLayout>
+      </GymGuard>
     </AuthGuard>
   ),
 
@@ -114,15 +119,29 @@ export const userRoutes: RouteObject = {
   ],
 };
 
+export const onboardingRoutes: RouteObject = {
+  element: (
+    <AuthGuard>
+      <AuthLayout>
+        <Suspense fallback={<SplashScreen />}>
+          <Outlet />
+        </Suspense>
+      </AuthLayout>
+    </AuthGuard>
+  ),
+  children: [onboardingUserPageRoute],
+};
+
 function Test() {
   const { user } = useAuthContext();
 
   const handleRefresh = async () => {
     try {
-      console.log('Manual refresh triggered...');
-      const response = await api.post('/refresh-token/refresh');
-      console.log('Refresh successful:', response.data);
-      alert('Token Refresh Success! Check Console.');
+      // console.log('Manual refresh triggered...');
+      // const response = await api.post('/refresh-token/refresh');
+      // console.log('Refresh successful:', response.data);
+      // alert('Token Refresh Success! Check Console.');
+      await getUserProfile();
     } catch (error: any) {
       console.error('Refresh failed:', error.response?.data || error);
       alert('Token Refresh Failed! Check Console.');

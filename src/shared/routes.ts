@@ -7,7 +7,7 @@ export const pathKeys = {
   login: '/login/',
   register: '/register/',
   page404: '/404/',
-
+  onboarding: '/onboarding/',
   // dashboard
   dashboard: {
     root: '/',
@@ -43,9 +43,4 @@ export const pathKeys = {
     userLogin: '/login/',
     userRegister: '/register/',
   },
-};
-
-// export const userPermissionsMap = {
-export const userPermissionsMap = {};
-
-export const paths = pathKeys;
+} as const;
