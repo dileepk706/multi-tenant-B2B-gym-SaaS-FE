@@ -31,11 +31,9 @@ export function AuthProvider({ children }: Props) {
       const { user: refreshedUser } = response.data.data;
       setUser(refreshedUser);
     } catch (error) {
-      if (!sessionExpired) {
-        dispatch(logoutAction());
-      }
+      console.log('profile fetching error', error);
     }
-  }, [dispatch, sessionExpired]);
+  }, []);
 
   const initialize = useCallback(async () => {
     dispatch(setLoading(true));
@@ -68,6 +66,7 @@ export function AuthProvider({ children }: Props) {
     [dispatch]
   );
 
+
   const register = useCallback(async (registerUserDto: RegisterUserDto) => {
     const response = await registerUser(registerUserDto);
     return response.data;
@@ -94,8 +93,9 @@ export function AuthProvider({ children }: Props) {
       login,
       logout,
       register,
+      refreshProfile: fetchUserProfile,
     }),
-    [status, user, login, logout, register]
+    [status, user, login, logout, register, fetchUserProfile]
   );
 
   return <AuthContext.Provider value={memoizedValue}>{children}</AuthContext.Provider>;

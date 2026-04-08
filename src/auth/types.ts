@@ -30,4 +30,6 @@ export type JWTContextType = {
   login: (loginUserDto: LoginUserDto) => Promise<any>;
   register: (registerUserDto: RegisterUserDto) => Promise<any>;
   logout: () => Promise<void>;
+  refreshProfile: () => Promise<void>;
 };
+

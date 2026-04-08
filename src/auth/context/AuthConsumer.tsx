@@ -13,7 +13,7 @@ export function AuthConsumer({ children }: Props) {
       {(auth) => {
         if (auth.loading) {
           // return <SplashScreen />;
-          return <h1>Loading profile</h1>;
+          return <h1>Profile Loading</h1>;
         }
         return children;
       }}
