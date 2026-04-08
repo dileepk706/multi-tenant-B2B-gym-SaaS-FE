@@ -37,7 +37,15 @@ export const ProfileDataSchema = z.object({
   user: UserSchema,
 });
 
+export const OnboardingDtoSchema = z.object({
+  name: z.string(),
+  address: z.string().optional(),
+  city: z.string(),
+  gym_url: z.string(),
+});
+
 // Full response schemas
 export const LoginResponseSchema = createApiResponseSchema(LoginDataSchema);
 export const ProfileResponseSchema = createApiResponseSchema(ProfileDataSchema);
 export const RegisterResponseSchema = createApiResponseSchema(ProfileDataSchema);
+export const OnboardingResponseSchema = createApiResponseSchema(OnboardingDtoSchema);

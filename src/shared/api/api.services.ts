@@ -6,8 +6,9 @@ import {
   LoginResponseSchema,
   RegisterResponseSchema,
   ProfileResponseSchema,
+  OnboardingDtoSchema,
 } from './api.contracts';
-import { LoginUserDto, RegisterUserDto } from './api.types';
+import { LoginUserDto, OnboardingDto, RegisterUserDto } from './api.types';
 import { responseContract } from './api.lib';
 
 export function loginUser(loginUserDto: LoginUserDto, config?: AxiosRequestConfig<LoginUserDto>) {
@@ -31,4 +32,12 @@ export function logoutUser(config?: AxiosRequestConfig) {
 
 export function getUserProfile(config?: AxiosRequestConfig) {
   return api.get('/user/profile', config).then(responseContract(ProfileResponseSchema));
+}
+
+export function onboardingCreateWorkSpace(
+  onboardingData: OnboardingDto,
+  config?: AxiosRequestConfig<OnboardingDto>
+) {
+  const data = OnboardingDtoSchema.parse(onboardingData);
+  return api.post('/onboarding/create-workspace', data, config);
 }

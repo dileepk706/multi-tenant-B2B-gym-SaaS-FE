@@ -1,7 +1,7 @@
 import axios, { AxiosError } from 'axios';
 import { store } from '@redux/store';
 import { setSessionExpired, login } from '@redux/slices/auth';
-import { HOST_API } from 'config-global';
+import { SERVER_BASE_URL } from 'config-global';
 import { ApiErrorDataDtoSchema } from './api.contracts';
 import { normalizeValidationErrors } from './api.lib';
 
@@ -21,8 +21,17 @@ const processQueue = (error: any, token: string | null = null) => {
   failedQueue = [];
 };
 
+export const getRefreshToken = async () => {
+  const response = await axios.post(
+    `${SERVER_BASE_URL}/refresh-token/refresh`,
+    {},
+    { withCredentials: true }
+  );
+  return response.data.data.accessToken;
+};
+
 export const api = axios.create({
-  baseURL: HOST_API,
+  baseURL: SERVER_BASE_URL,
   withCredentials: true,
 });
 
@@ -65,12 +74,7 @@ api.interceptors.response.use(
 
       try {
         // Use full URL and base axios to avoid interceptor loop
-        const response = await axios.post(
-          `${HOST_API}/refresh-token/refresh`,
-          {},
-          { withCredentials: true }
-        );
-        const { accessToken } = response.data.data; // Assuming nested structure based on user's backend sendSuccess
+        const accessToken = await getRefreshToken();
 
         store.dispatch(login({ accessToken }));
 
